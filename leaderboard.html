@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flappy Adheesh Gay Arcade</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
+
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      overflow-x: hidden;
+      font-family: 'Press Start 2P', cursive;
+    }
+
+    #board {
+      display: block;
+      margin: auto;
+      background-image: url("./flappybirdbg.png");
+    }
+
+    .overlay {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding-top: 20px;
+      color: #00ffff;
+    }
+
+    #playGameOverlay h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px #00ffff;
+    }
+
+    #playBtn {
+      font-size: 20px;
+      padding: 14px 30px;
+      border: 3px solid #00ffff;
+      border-radius: 10px;
+      color: #fff;
+      background-color: transparent;
+      text-shadow: 0 0 5px #0ff;
+      box-shadow: 0 0 10px #0ff, inset 0 0 5px #0ff;
+      transition: all 0.3s ease;
+    }
+
+    #playBtn:hover {
+      background-color: #0ff;
+      color: black;
+      box-shadow: 0 0 20px #0ff;
+    }
+
+    .navbar {
+      background-color: #111 !important;
+      z-index: 20;
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: #0ff !important;
+      font-weight: bold;
+      font-family: monospace;
+      text-shadow: 0 0 6px #0ff;
+    }
+
+    .navbar-toggler {
+      border: none;
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='cyan' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+
+    #leaderboardContainer {
+      margin: 4rem auto;
+      padding: 1rem;
+      max-width: 700px;
+      background: #000;
+      border: 4px solid #FFD700;
+      border-radius: 20px;
+      box-shadow: 0 0 20px #FFD700;
+      font-family: 'Press Start 2P', cursive;
+      color: #fff;
+    }
+
+    .leaderboard-title {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #FFD700;
+    }
+
+    #leaderboardTable {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    #leaderboardTable th,
+    #leaderboardTable td {
+      border: 1px solid #FFD700;
+      padding: 8px;
+      text-align: center;
+    }
+
+    #leaderboardTable th {
+      background-color: #111;
+      color: #FFD700;
+    }
+
+    #leaderboardTable td {
+      background-color: #222;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">🏳️‍🌈 Adheesh Gay Arcade</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/karokei.html">Karaoke</a></li>
+          <li class="nav-item"><a class="nav-link" href="/gallery.html">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="/comments.html">Comments</a></li>
+          <li class="nav-item"><a class="nav-link" href="/leaderboard.html">Leaderboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/why.html">Why is Adheesh Gay</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Leaderboard Section -->
+  <div id="leaderboardContainer">
+    <h2 class="leaderboard-title">🏆 Top 10 Adheesh Arcade Scores 🏆</h2>
+    <table id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Name</th>
+          <th>Score</th>
+          <th>Comment</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody">
+        <!-- Scores will be inserted here -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Firebase Integration -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC3PYiMs3ICRdT-GnDBOMqcqpHX-SzuwcM",
+      authDomain: "flappy-adheesh.firebaseapp.com",
+      projectId: "flappy-adheesh",
+      storageBucket: "flappy-adheesh.firebasestorage.app",
+      messagingSenderId: "843746513344",
+      appId: "1:843746513344:web:ec2b984be73f086eeb7825",
+      measurementId: "G-ZGKNZMSBHB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "scores"));
+        const scores = [];
+
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          scores.push({
+            name: data.name || "Anonymous",
+            comment: data.comment || "",
+            score: parseInt(data.score) || 0
+          });
+        });
+
+        scores.sort((a, b) => b.score - a.score);
+        const top10 = scores.slice(0, 10);
+
+        const tbody = document.getElementById("leaderboardBody");
+        tbody.innerHTML = "";
+
+        top10.forEach((entry, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${entry.name}</td>
+            <td>${entry.score}</td>
+            <td>${entry.comment}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.error("Error loading scores from Firestore:", error);
+      }
+    });
+  </script>
+
+  <!-- Bootstrap JS Bundle for Navbar toggler -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

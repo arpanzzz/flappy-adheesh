@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Comments - Adheesh Gay Arcade</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
+
+  <style>
+    body {
+      background-color: black;
+      color: #0ff;
+      font-family: 'Press Start 2P', cursive;
+      padding-top: 56px; /* navbar height */
+    }
+    .navbar, .nav-link, .navbar-brand {
+      background-color: #111 !important;
+      color: #0ff !important;
+      font-weight: bold;
+      font-family: monospace;
+      text-shadow: 0 0 6px #0ff;
+    }
+    .container {
+      max-width: 800px;
+      margin-top: 1rem;
+    }
+    .comment-box {
+      background: #000022;
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+    .comment-header {
+      font-weight: bold;
+      margin-bottom: 0.3rem;
+      font-size: 0.8rem;
+    }
+    .comment-text {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+      white-space: pre-wrap;
+    }
+    .like-btn {
+      cursor: pointer;
+      color: #0ff;
+      border: none;
+      background: none;
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .like-btn:hover {
+      color: #00ffff;
+    }
+   .tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  font-family: 'Press Start 2P', cursive;
+  text-transform: uppercase;
+  margin: 10px;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  background-color: #111;
+  border: 2px solid #333;
+  border-radius: 8px;
+  color: #fff;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 5px rgba(0,255,255,0.2);
+}
+
+.tab:hover {
+  background-color: #222;
+  border-color: #0ff;
+  box-shadow: 0 0 10px rgba(0,255,255,0.5);
+  color: #0ff;
+}
+
+.tab.active {
+  background-color: #0ff;
+  color: #000;
+  border-color: #0ff;
+  box-shadow: 0 0 15px rgba(0,255,255,0.7);
+}
+
+    form input, form textarea {
+      width: 100%;
+      font-family: 'Press Start 2P', cursive;
+      background: black;
+      color: #0ff;
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      resize: none;
+    }
+    form button {
+      background: #0ff;
+      color: black;
+      font-family: 'Press Start 2P', cursive;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 0.7rem 1.5rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    form button:hover {
+      background: #00ffff;
+    }
+    .error-msg {
+      color: #ff4d4d;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">🏳️‍🌈 Adheesh Gay Arcade</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="/karokei.html">Karaoke</a></li>
+          <li class="nav-item"><a class="nav-link" href="/gallery.html">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link active" href="/comments.html">Comments</a></li>
+          <li class="nav-item"><a class="nav-link" href="/leaderboard.html">Leaderboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="/why.html">Why is Adheesh Gay</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+
+    <h1>Comments</h1>
+
+    <!-- Comment Form -->
+    <form id="commentForm" autocomplete="off">
+      <div class="error-msg" id="errorMsg" style="display:none;"></div>
+      <input type="text" id="nameInput" placeholder="Your name (required)" required />
+      <textarea id="commentInput" rows="3" placeholder="Your comment (required)" required></textarea>
+      <button type="submit">Post Comment</button>
+    </form>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="latest">Latest Comments</div>
+      <div class="tab" data-tab="liked">Most Liked</div>
+    </div>
+
+    <!-- Comments Container -->
+    <div id="commentsContainer"></div>
+  </div>
+
+  <!-- Firebase scripts -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, query, orderBy, doc, updateDoc, Timestamp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    // Your Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyC3PYiMs3ICRdT-GnDBOMqcqpHX-SzuwcM",
+      authDomain: "flappy-adheesh.firebaseapp.com",
+      projectId: "flappy-adheesh",
+      storageBucket: "flappy-adheesh.firebasestorage.app",
+      messagingSenderId: "843746513344",
+      appId: "1:843746513344:web:ec2b984be73f086eeb7825",
+      measurementId: "G-ZGKNZMSBHB"
+    };
+
+    // Initialize Firebase app and Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const commentsContainer = document.getElementById("commentsContainer");
+    const tabs = document.querySelectorAll(".tab");
+    const errorMsg = document.getElementById("errorMsg");
+    const commentForm = document.getElementById("commentForm");
+
+    let comments = [];
+    let activeTab = "latest";
+
+    // Fetch comments from Firestore
+    async function fetchComments() {
+      try {
+        const commentsRef = collection(db, "comments");
+        const snapshot = await getDocs(commentsRef);
+        comments = [];
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          comments.push({
+            id: docSnap.id,
+            name: data.name,
+            comment: data.comment,
+            likes: data.likes ?? 0,
+            timestamp: data.timestamp ? data.timestamp.toDate() : new Date(0)
+          });
+        });
+        renderComments();
+      } catch (err) {
+        commentsContainer.innerHTML = `<p style="color:red;">Failed to load comments: ${err.message}</p>`;
+      }
+    }
+
+    // Render comments based on active tab
+    function renderComments() {
+      let sortedComments;
+      if (activeTab === "latest") {
+        sortedComments = [...comments].sort((a,b) => b.timestamp - a.timestamp);
+      } else if (activeTab === "liked") {
+        sortedComments = [...comments].sort((a,b) => b.likes - a.likes);
+      }
+
+      if (sortedComments.length === 0) {
+        commentsContainer.innerHTML = `<p>No comments yet.</p>`;
+        return;
+      }
+
+      commentsContainer.innerHTML = sortedComments.map(c => `
+        <div class="comment-box" data-id="${c.id}">
+          <div class="comment-header">${escapeHtml(c.name)} - ${c.timestamp.toLocaleString()}</div>
+          <div class="comment-text">${escapeHtml(c.comment)}</div>
+          <button class="like-btn" data-id="${c.id}" aria-label="Like comment">
+            ❤️ <span class="like-count">${c.likes}</span>
+          </button>
+        </div>
+      `).join('');
+
+      // Add like button event listeners
+      document.querySelectorAll(".like-btn").forEach(btn => {
+        btn.onclick = async () => {
+          const id = btn.getAttribute("data-id");
+          const comment = comments.find(c => c.id === id);
+          if (!comment) return;
+
+          btn.disabled = true;
+          comment.likes++;
+          btn.querySelector(".like-count").textContent = comment.likes;
+
+          try {
+            await updateLikes(id, comment.likes);
+          } catch {
+            comment.likes--;
+            btn.querySelector(".like-count").textContent = comment.likes;
+            alert("Failed to update likes. Please try again.");
+          }
+          btn.disabled = false;
+        };
+      });
+    }
+
+    // Update likes in Firestore
+    async function updateLikes(id, likes) {
+      const commentDocRef = doc(db, "comments", id);
+      await updateDoc(commentDocRef, { likes });
+    }
+
+    // Escape HTML for safety
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Handle tab switching
+    tabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        if (tab.classList.contains("active")) return;
+
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        activeTab = tab.getAttribute("data-tab");
+        renderComments();
+      });
+    });
+
+    // Handle form submit to post comment
+    commentForm.addEventListener("submit", async e => {
+      e.preventDefault();
+      errorMsg.style.display = "none";
+
+      const name = commentForm.nameInput.value.trim();
+      const comment = commentForm.commentInput.value.trim();
+
+      if (!name || !comment) {
+        errorMsg.textContent = "Name and comment are required!";
+        errorMsg.style.display = "block";
+        return;
+      }
+      if (comment.length > 300) {
+        errorMsg.textContent = "Comment too long (max 300 chars).";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      // Disable submit while saving
+      commentForm.querySelector("button").disabled = true;
+
+      try {
+        const docRef = await addDoc(collection(db, "comments"), {
+          name,
+          comment,
+          likes: 0,
+          timestamp: Timestamp.now()
+        });
+
+        // Add new comment to local list
+        comments.push({
+          id: docRef.id,
+          name,
+          comment,
+          likes: 0,
+          timestamp: new Date()
+        });
+
+        commentForm.reset();
+        renderComments();
+
+      } catch (err) {
+        errorMsg.textContent = "Failed to post comment: " + err.message;
+        errorMsg.style.display = "block";
+      }
+
+      commentForm.querySelector("button").disabled = false;
+    });
+
+    // Initial fetch
+    fetchComments();
+  </script>
+
+  <!-- Bootstrap JS bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

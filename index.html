@@ -1,104 +1,192 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Flappy Bird with Score Upload</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flappy Adheesh Gay Arcade</title>
 
-    <!-- Bootstrap for Navbar -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" />
 
-    <style>
-        body {
-            background-color: black;
-            margin: 0;
-            overflow: hidden;
-            font-family: 'Roboto', sans-serif;
-        }
+  <style>
+    body {
+      background-color: black;
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Press Start 2P', cursive;
+    }
 
-        #board {
-            display: block;
-            margin: auto;
-            background-image: url("./flappybirdbg.png");
-        }
+    #board {
+      display: block;
+      margin: auto;
+      background-image: url("./flappybirdbg.png");
+    }
 
-        #userInputOverlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.85);
-            display: flex; justify-content: center; align-items: center;
-            color: white;
-            z-index: 10;
-        }
+    .overlay {
+      position: fixed;
+      top: 56px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 10;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      text-align: center;
+      padding-top: 20px;
+      color: #00ffff;
+    }
 
-        #userInputOverlay input, #userInputOverlay textarea {
-            display: block; margin: 10px 0; width: 300px; font-size: 18px; padding: 8px;
-            border-radius: 5px; border: none;
-        }
+    #playGameOverlay h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      text-shadow: 0 0 8px #00ffff;
+    }
 
-        #userInputOverlay button {
-            font-size: 18px; padding: 8px 16px; border-radius: 5px; border: none; cursor: pointer;
-            background: #28a745; color: white;
-        }
+    #playBtn {
+      font-size: 20px;
+      padding: 14px 30px;
+      border: 3px solid #00ffff;
+      border-radius: 10px;
+      color: #fff;
+      background-color: transparent;
+      text-shadow: 0 0 5px #0ff;
+      box-shadow: 0 0 10px #0ff, inset 0 0 5px #0ff;
+      transition: all 0.3s ease;
+    }
 
-        .navbar {
-            background-color: #111 !important;
-        }
+    #playBtn:hover {
+      background-color: #0ff;
+      color: black;
+      box-shadow: 0 0 20px #0ff;
+    }
 
-        .navbar-brand, .nav-link {
-            color: #0ff !important;
-            font-weight: bold;
-            font-family: monospace;
-            text-shadow: 0 0 6px #0ff;
-        }
-    </style>
+    #userInputOverlay input,
+    #userInputOverlay textarea {
+      display: block;
+      margin: 10px auto;
+      width: 280px;
+      font-size: 14px;
+      padding: 8px;
+      border-radius: 5px;
+      border: none;
+    }
 
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700" />
+    #userInputOverlay button {
+      font-size: 16px;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: none;
+      cursor: pointer;
+      background: #28a745;
+      color: white;
+    }
+
+    .navbar {
+      background-color: #111 !important;
+      z-index: 20;
+    }
+
+    .navbar-brand,
+    .nav-link {
+      color: #0ff !important;
+      font-weight: bold;
+      font-family: monospace;
+      text-shadow: 0 0 6px #0ff;
+    }
+
+    .navbar-toggler {
+      border: none;
+    }
+
+    .navbar-toggler-icon {
+      background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 30 30' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='cyan' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
+    }
+  </style>
 </head>
 <body>
-
-<!-- Navbar -->
-<nav class="navbar navbar-expand-lg">
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="#">🏳️‍🌈 Adheesh Gay Arcade</a>
-        <div class="collapse navbar-collapse">
-            <ul class="navbar-nav ms-auto">
-                <li class="nav-item"><a class="nav-link" href="#">Scoreboard</a></li>
-                <li class="nav-item"><a class="nav-link" href="#">About</a></li>
-            </ul>
-        </div>
+      <a class="navbar-brand" href="#">🏳️‍🌈 Adheesh Gay Arcade</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="karokei.html">Karaoke</a></li>
+          <li class="nav-item"><a class="nav-link" href="gallery.html">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="comments.html">Comments</a></li>
+          <li class="nav-item"><a class="nav-link" href="leaderboard.html">Leaderboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="why.html">Why is Adheesh Gay</a></li>
+        </ul>
+      </div>
     </div>
-</nav>
+  </nav>
 
-<!-- Input Overlay -->
-<div id="userInputOverlay">
+  <!-- Welcome Overlay -->
+  <div id="playGameOverlay" class="overlay">
+    <h1>🎉 Welcome to Flappy Adheesh Gay Arcade 🎉</h1>
+    <button id="playBtn">🕹️ PLAY GAME 🕹️</button>
+  </div>
+
+  <!-- Input Overlay -->
+  <div id="userInputOverlay" class="overlay" style="display: none;">
     <div>
-        <h2>Enter your name and comment</h2>
-        <input id="username" type="text" placeholder="Your name" />
-        <textarea id="usercomment" rows="3" placeholder="Your comment for Adheesh"></textarea>
-        <button id="startBtn">Start Game</button>
+      <h2>Enter your name and comment</h2>
+      <input id="username" type="text" placeholder="Your name" />
+      <textarea id="usercomment" rows="3" placeholder="Your comment for Adheesh"></textarea>
+      <button id="startBtn">Start Game</button>
     </div>
-</div>
+  </div>
 
-<canvas id="board"></canvas>
+  <!-- Game Canvas -->
+  <canvas id="board"></canvas>
 
-<script>
+  <!-- Firebase and Game Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.8.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC3PYiMs3ICRdT-GnDBOMqcqpHX-SzuwcM",
+      authDomain: "flappy-adheesh.firebaseapp.com",
+      projectId: "flappy-adheesh",
+      storageBucket: "flappy-adheesh.appspot.com",
+      messagingSenderId: "843746513344",
+      appId: "1:843746513344:web:ec2b984be73f086eeb7825",
+      measurementId: "G-ZGKNZMSBHB"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
     let userName = null;
     let userComment = null;
 
+    document.getElementById("playBtn").onclick = () => {
+      document.getElementById("playGameOverlay").style.display = "none";
+      document.getElementById("userInputOverlay").style.display = "flex";
+    };
+
     document.getElementById("startBtn").onclick = () => {
-        const nameInput = document.getElementById("username").value.trim();
-        const commentInput = document.getElementById("usercomment").value.trim();
+      const nameInput = document.getElementById("username").value.trim();
+      const commentInput = document.getElementById("usercomment").value.trim();
 
-        if(!nameInput) {
-            alert("Please enter your name.");
-            return;
-        }
+      if (!nameInput) {
+        alert("Please enter your name.");
+        return;
+      }
 
-        userName = nameInput;
-        userComment = commentInput;
+      userName = nameInput;
+      userComment = commentInput;
 
-        document.getElementById("userInputOverlay").style.display = "none";
-        startGame();
+      document.getElementById("userInputOverlay").style.display = "none";
+      startGame();
     };
 
     let board, context;
@@ -123,144 +211,141 @@
     let score = 0;
 
     function startGame() {
-        board = document.getElementById("board");
-        board.width = boardWidth;
-        board.height = boardHeight;
-        context = board.getContext("2d");
+      board = document.getElementById("board");
+      board.width = boardWidth;
+      board.height = boardHeight;
+      context = board.getContext("2d");
 
-        birdImg = new Image();
-        birdImg.src = "./flappybird.png";
+      birdImg = new Image();
+      birdImg.src = "./flappybird.png";
 
-        topPipeImg = new Image();
-        topPipeImg.src = "./toppipe.png";
+      topPipeImg = new Image();
+      topPipeImg.src = "./toppipe.png";
 
-        bottomPipeImg = new Image();
-        bottomPipeImg.src = "./bottompipe.png";
+      bottomPipeImg = new Image();
+      bottomPipeImg.src = "./bottompipe.png";
 
-        bird.y = birdY;
-        velocityY = 0;
-        pipeArray = [];
-        score = 0;
-        gameOver = false;
+      bird.y = birdY;
+      velocityY = 0;
+      pipeArray = [];
+      score = 0;
+      gameOver = false;
 
-        document.addEventListener("keydown", moveBird);
-        document.addEventListener("mousedown", moveBird);
-        document.addEventListener("touchstart", moveBird);
+      document.addEventListener("keydown", moveBird);
+      document.addEventListener("mousedown", moveBird);
+      document.addEventListener("touchstart", moveBird);
 
-        requestAnimationFrame(update);
-        setInterval(placePipes, 2000); // Slower pipe frequency
+      requestAnimationFrame(update);
+      setInterval(placePipes, 2000);
     }
 
     function update() {
-        requestAnimationFrame(update);
-        if (gameOver) return;
+      requestAnimationFrame(update);
+      if (gameOver) return;
 
-        context.clearRect(0, 0, board.width, board.height);
+      context.clearRect(0, 0, board.width, board.height);
 
-        velocityY += gravity;
-        bird.y = Math.max(bird.y + velocityY, 0);
-        context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+      velocityY += gravity;
+      bird.y = Math.max(bird.y + velocityY, 0);
+      context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
-        if (bird.y > board.height) return endGame();
+      if (bird.y > board.height) return endGame();
 
-        for (let pipe of pipeArray) {
-            pipe.x += velocityX;
-            context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+      for (let pipe of pipeArray) {
+        pipe.x += velocityX;
+        context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
 
-            if (!pipe.passed && bird.x > pipe.x + pipe.width) {
-                score += 0.5;
-                pipe.passed = true;
-            }
-
-            if (detectCollision(bird, pipe)) return endGame();
+        if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+          score += 0.5;
+          pipe.passed = true;
         }
 
-        while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
-            pipeArray.shift();
-        }
+        if (detectCollision(bird, pipe)) return endGame();
+      }
 
-        context.fillStyle = "white";
-        context.font = "45px sans-serif";
-        context.fillText(Math.floor(score), 5, 45);
+      while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
+        pipeArray.shift();
+      }
+
+      context.fillStyle = "white";
+      context.font = "45px sans-serif";
+      context.fillText(Math.floor(score), 5, 45);
     }
 
     function placePipes() {
-        if (gameOver) return;
+      if (gameOver) return;
 
-        let randomPipeY = pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 1.5);
-        let openingSpace = board.height / 3.5;
+      let randomPipeY = pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 1.5);
+      let openingSpace = board.height / 3.5;
 
-        pipeArray.push({
-            img: topPipeImg,
-            x: pipeX,
-            y: randomPipeY,
-            width: pipeWidth,
-            height: pipeHeight,
-            passed: false,
-        });
+      pipeArray.push({
+        img: topPipeImg,
+        x: pipeX,
+        y: randomPipeY,
+        width: pipeWidth,
+        height: pipeHeight,
+        passed: false,
+      });
 
-        pipeArray.push({
-            img: bottomPipeImg,
-            x: pipeX,
-            y: randomPipeY + pipeHeight + openingSpace,
-            width: pipeWidth,
-            height: pipeHeight,
-            passed: false,
-        });
+      pipeArray.push({
+        img: bottomPipeImg,
+        x: pipeX,
+        y: randomPipeY + pipeHeight + openingSpace,
+        width: pipeWidth,
+        height: pipeHeight,
+        passed: false,
+      });
     }
 
     function moveBird(e) {
-        if (
-            e.code === "Space" ||
-            e.code === "ArrowUp" ||
-            e.code === "KeyX" ||
-            e.type === "mousedown" ||
-            e.type === "touchstart"
-        ) {
-            velocityY = -5;
+      if (
+        e.code === "Space" ||
+        e.code === "ArrowUp" ||
+        e.code === "KeyX" ||
+        e.type === "mousedown" ||
+        e.type === "touchstart"
+      ) {
+        velocityY = -5;
 
-            if (gameOver) {
-                bird.y = birdY;
-                pipeArray = [];
-                score = 0;
-                gameOver = false;
-            }
+        if (gameOver) {
+          bird.y = birdY;
+          pipeArray = [];
+          score = 0;
+          gameOver = false;
         }
+      }
     }
 
     function detectCollision(a, b) {
-        return (
-            a.x < b.x + b.width &&
-            a.x + a.width > b.x &&
-            a.y < b.y + b.height &&
-            a.y + a.height > b.y
-        );
+      return (
+        a.x < b.x + b.width &&
+        a.x + a.width > b.x &&
+        a.y < b.y + b.height &&
+        a.y + a.height > b.y
+      );
     }
 
-    function endGame() {
-        gameOver = true;
+    async function endGame() {
+      gameOver = true;
+      context.fillStyle = "white";
+      context.font = "45px sans-serif";
+      context.fillText("GAME OVER", 5, 90);
 
-        context.fillStyle = "white";
-        context.font = "45px sans-serif";
-        context.fillText("GAME OVER", 5, 90);
-
-        postScore(userName, userComment, Math.floor(score));
+      try {
+        await addDoc(collection(db, "scores"), {
+          name: userName,
+          comment: userComment,
+          score: Math.floor(score),
+          createdAt: new Date(),
+        });
+        console.log("Score added");
+      } catch (e) {
+        console.error("Error adding score:", e);
+      }
     }
+  </script>
 
-    function postScore(name, comment, score) {
-        const url = "https://v1.nocodeapi.com/justarpaan/google_sheets/FSLilTVNFEYqlrpo?tabId=Sheet1";
-        const bodyData = JSON.stringify([[name, comment, score]]);
-
-        fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: bodyData,
-        })
-        .then((response) => response.text())
-        .then((result) => console.log("Score posted:", result))
-        .catch((error) => console.error("Error posting score:", error));
-    }
-</script>
-
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
