@@ -203,9 +203,9 @@
     let pipeArray = [];
     let pipeWidth = 64, pipeHeight = 512, pipeX = boardWidth, pipeY = 0;
 
-    let velocityX = -1.5;
+    let velocityX = -1.2; // slower pipe movement
     let velocityY = 0;
-    let gravity = 0.25;
+    let gravity = 0.18; // easier gravity
 
     let gameOver = false;
     let score = 0;
@@ -236,7 +236,7 @@
       document.addEventListener("touchstart", moveBird);
 
       requestAnimationFrame(update);
-      setInterval(placePipes, 2000);
+      setInterval(placePipes, 3000); // reduced frequency
     }
 
     function update() {
@@ -276,7 +276,7 @@
       if (gameOver) return;
 
       let randomPipeY = pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 1.5);
-      let openingSpace = board.height / 3.5;
+      let openingSpace = board.height / 2.5; // wider gap
 
       pipeArray.push({
         img: topPipeImg,
@@ -306,7 +306,6 @@
         e.type === "touchstart"
       ) {
         velocityY = -5;
-
         if (gameOver) {
           bird.y = birdY;
           pipeArray = [];
