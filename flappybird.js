@@ -6,10 +6,10 @@ let boardHeight = 640;
 let context;
 
 //bird
-let birdWidth = 34; //width/height ratio = 408/228 = 17/12
-let birdHeight = 24;
-let birdX = boardWidth/8;
-let birdY = boardHeight/2;
+let birdWidth = 34 * 1.4; //width/height ratio = 408/228 = 17/12
+let birdHeight = 24 * 1.4;
+let birdX = boardWidth/6;
+let birdY = boardHeight/1.5;
 let birdImg;
 
 let bird = {
@@ -63,6 +63,9 @@ window.onload = function() {
     requestAnimationFrame(update);
     setInterval(placePipes, 1500); //every 1.5 seconds
     document.addEventListener("keydown", moveBird);
+    document.addEventListener("mousedown", moveBird);
+    document.addEventListener("touchstart", moveBird);
+
 }
 
 function update() {
@@ -118,10 +121,8 @@ function placePipes() {
         return;
     }
 
-    //(0-1) * pipeHeight/2.
-    // 0 -> -128 (pipeHeight/4)
-    // 1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
-    let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/2);
+    
+    let randomPipeY = pipeY - pipeHeight/4 - Math.random()*(pipeHeight/1.5);
     let openingSpace = board.height/4;
 
     let topPipe = {
@@ -144,13 +145,19 @@ function placePipes() {
     }
     pipeArray.push(bottomPipe);
 }
-
 function moveBird(e) {
-    if (e.code == "Space" || e.code == "ArrowUp" || e.code == "KeyX") {
-        //jump
+    // Allow keyboard, mouse click, or touch
+    if (
+        e.code === "Space" ||
+        e.code === "ArrowUp" ||
+        e.code === "KeyX" ||
+        e.type === "mousedown" ||
+        e.type === "touchstart"
+    ) {
+        // jump
         velocityY = -6;
 
-        //reset game
+        // reset game
         if (gameOver) {
             bird.y = birdY;
             pipeArray = [];

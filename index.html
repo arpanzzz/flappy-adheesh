@@ -1,13 +1,265 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport", content="width=device-width, initial-scale=1.0">
-        <title>Flappy Bird</title>
-        <link rel="stylesheet" href="flappybird.css">
-        <script src="flappybird.js"></script>
-    </head>
-    <body>
-        <canvas id="board"></canvas>
-    </body>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Flappy Bird with Score Upload</title>
+    <style>
+        body { background-color: black; margin: 0; overflow: hidden; }
+        #board { display: block; margin: auto; background-color: #000; }
+        #userInputOverlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85);
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-family: sans-serif;
+            z-index: 10;
+        }
+        #userInputOverlay input, #userInputOverlay textarea {
+            display: block; margin: 10px 0; width: 300px; font-size: 18px; padding: 8px;
+            border-radius: 5px; border: none;
+        }
+        #userInputOverlay button {
+            font-size: 18px; padding: 8px 16px; border-radius: 5px; border: none; cursor: pointer;
+            background: #28a745; color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:400,700" />
+    <link rel="stylesheet" href="./flappybird.css">
+</head>
+<body>
+
+
+
+<div id="userInputOverlay">
+    <div>
+        <h2>Enter your name and comment</h2>
+        <input id="username" type="text" placeholder="Your name" />
+        <textarea id="usercomment" rows="3" placeholder="Your comment"></textarea>
+        <button id="startBtn">Start Game</button>
+    </div>
+</div>
+
+<canvas id="board"></canvas>
+
+<script>
+    // Variables for user info
+    let userName = null;
+    let userComment = null;
+
+    // Wait for user to input name and comment before starting game
+    document.getElementById("startBtn").onclick = () => {
+        const nameInput = document.getElementById("username").value.trim();
+        const commentInput = document.getElementById("usercomment").value.trim();
+
+        if(!nameInput) {
+            alert("Please enter your name.");
+            return;
+        }
+
+        userName = nameInput;
+        userComment = commentInput;
+
+        // Hide overlay and start game
+        document.getElementById("userInputOverlay").style.display = "none";
+        startGame();
+    };
+
+    // Flappy bird game variables and functions
+    let board;
+    let boardWidth = 360;
+    let boardHeight = 640;
+    let context;
+
+    let birdWidth = 34 * 1.4;
+    let birdHeight = 24 * 1.4;
+    let birdX = boardWidth / 6;
+    let birdY = boardHeight / 1.5;
+    let birdImg;
+
+    let bird = {
+        x: birdX,
+        y: birdY,
+        width: birdWidth,
+        height: birdHeight,
+    };
+
+    let pipeArray = [];
+    let pipeWidth = 64;
+    let pipeHeight = 512;
+    let pipeX = boardWidth;
+    let pipeY = 0;
+
+    let topPipeImg;
+    let bottomPipeImg;
+
+    let velocityX = -2;
+    let velocityY = 0;
+    let gravity = 0.4;
+
+    let gameOver = false;
+    let score = 0;
+
+    function startGame() {
+        board = document.getElementById("board");
+        board.height = boardHeight;
+        board.width = boardWidth;
+        context = board.getContext("2d");
+
+        // Load images
+        birdImg = new Image();
+        birdImg.src = "./flappybird.png";
+
+        topPipeImg = new Image();
+        topPipeImg.src = "./toppipe.png";
+
+        bottomPipeImg = new Image();
+        bottomPipeImg.src = "./bottompipe.png";
+
+        // Reset bird position etc
+        bird.y = birdY;
+        velocityY = 0;
+        pipeArray = [];
+        score = 0;
+        gameOver = false;
+
+        // Setup event listeners for controlling bird
+        document.addEventListener("keydown", moveBird);
+        document.addEventListener("mousedown", moveBird);
+        document.addEventListener("touchstart", moveBird);
+
+        requestAnimationFrame(update);
+        setInterval(placePipes, 1500);
+    }
+
+    function update() {
+        requestAnimationFrame(update);
+        if (gameOver) return;
+
+        context.clearRect(0, 0, board.width, board.height);
+
+        velocityY += gravity;
+        bird.y = Math.max(bird.y + velocityY, 0);
+        context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
+
+        if (bird.y > board.height) {
+            endGame();
+            return;
+        }
+
+        for (let i = 0; i < pipeArray.length; i++) {
+            let pipe = pipeArray[i];
+            pipe.x += velocityX;
+            context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
+
+            if (!pipe.passed && bird.x > pipe.x + pipe.width) {
+                score += 0.5;
+                pipe.passed = true;
+            }
+
+            if (detectCollision(bird, pipe)) {
+                endGame();
+                return;
+            }
+        }
+
+        while (pipeArray.length > 0 && pipeArray[0].x < -pipeWidth) {
+            pipeArray.shift();
+        }
+
+        context.fillStyle = "white";
+        context.font = "45px sans-serif";
+        context.fillText(Math.floor(score), 5, 45);
+    }
+
+    function placePipes() {
+        if (gameOver) return;
+
+        let randomPipeY = pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 1.5);
+        let openingSpace = board.height / 4;
+
+        let topPipe = {
+            img: topPipeImg,
+            x: pipeX,
+            y: randomPipeY,
+            width: pipeWidth,
+            height: pipeHeight,
+            passed: false,
+        };
+        pipeArray.push(topPipe);
+
+        let bottomPipe = {
+            img: bottomPipeImg,
+            x: pipeX,
+            y: randomPipeY + pipeHeight + openingSpace,
+            width: pipeWidth,
+            height: pipeHeight,
+            passed: false,
+        };
+        pipeArray.push(bottomPipe);
+    }
+
+    function moveBird(e) {
+        if (
+            e.code === "Space" ||
+            e.code === "ArrowUp" ||
+            e.code === "KeyX" ||
+            e.type === "mousedown" ||
+            e.type === "touchstart"
+        ) {
+            velocityY = -6;
+
+            if (gameOver) {
+                bird.y = birdY;
+                pipeArray = [];
+                score = 0;
+                gameOver = false;
+            }
+        }
+    }
+
+    function detectCollision(a, b) {
+        return (
+            a.x < b.x + b.width &&
+            a.x + a.width > b.x &&
+            a.y < b.y + b.height &&
+            a.y + a.height > b.y
+        );
+    }
+
+    // Called when game ends
+    function endGame() {
+        gameOver = true;
+
+        context.fillStyle = "white";
+        context.font = "45px sans-serif";
+        context.fillText("GAME OVER", 5, 90);
+
+        postScore(userName, userComment, Math.floor(score));
+    }
+
+    // Function to post score to Google Sheets via your endpoint
+    function postScore(name, comment, score) {
+        const url = "https://v1.nocodeapi.com/justarpaan/google_sheets/FSLilTVNFEYqlrpo?tabId=Sheet1";
+
+        // Format body as array of arrays with name, comment, score
+        const bodyData = JSON.stringify([[name, comment, score]]);
+
+        fetch(url, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: bodyData,
+        })
+            .then((response) => response.text())
+            .then((result) => {
+                console.log("Score posted:", result);
+            })
+            .catch((error) => {
+                console.error("Error posting score:", error);
+            });
+    }
+</script>
+
+</body>
 </html>
